@@ -18,7 +18,8 @@ function describeSlot(slot, blockIndex, positionIndex) {
 function updateBlocks() {
   [...blocks.children].forEach((block, index) => {
     const firstBeat = (index * 2) % 8 + 1;
-    block.querySelector('h3').textContent = `Beats ${firstBeat}–${firstBeat + 1}`;
+    // Support both heading levels while older HTML may still be cached.
+    block.querySelector('.block-heading h2, .block-heading h3').textContent = `Beats ${firstBeat}–${firstBeat + 1}`;
     block.setAttribute('aria-label', `Block ${index + 1}, beats ${firstBeat}–${firstBeat + 1}`);
     const remove = block.querySelector('.remove-button');
     remove.disabled = blocks.children.length === 1;

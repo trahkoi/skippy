@@ -4,6 +4,8 @@ A lightweight rhythm sketchbook made with plain HTML, CSS, and a little JavaScri
 
 Open `index.html` in your browser.
 
+To host it on your own server, follow the [Hetzner deployment guide](DEPLOYMENT.md) for DNS, HTTPS, and publishing updates.
+
 - Click a slot (or focus it and press Space/Enter) to cycle through empty → step → hop → action → empty.
 - Numbered counts use ● and ◯. The “&” and “a” subdivisions use • and ∘. A backslash represents an action without a weight change on any subdivision.
 - Add two-beat blocks; they wrap onto new lines as needed. Counts run from 1 through 8, then repeat.
