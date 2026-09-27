@@ -7,6 +7,7 @@ document.querySelector('#print-help').hidden = !printingEnabled;
 const actions = ['empty', 'step', 'hop', 'action without weight change'];
 // Probability of a symbol at each position: & a 1 & a 2.
 const actionProbabilities = [0.05, 0.4, 1, 0.2, 0.6, 1];
+const actionWeights = { step: 6, 'action without weight change': 3, hop: 1 };
 const symbols = { small: ['', '•', '∘', '\\'], large: ['', '●', '◯', '\\'] };
 
 function describeSlot(slot, blockIndex, positionIndex) {
@@ -37,12 +38,21 @@ function updateBlocks() {
   document.querySelector('#block-count').textContent = `${count} ${count === 1 ? 'block' : 'blocks'} · ${count * 2} beats`;
 }
 
+function randomActionState() {
+  const totalWeight = Object.values(actionWeights).reduce((sum, weight) => sum + weight, 0);
+  let roll = Math.random() * totalWeight;
+  for (const [action, weight] of Object.entries(actionWeights)) {
+    if (roll < weight) return actions.indexOf(action);
+    roll -= weight;
+  }
+}
+
 function randomizeBlock(block) {
   const slots = [...block.querySelectorAll('.slot')];
   slots.forEach((slot, index) => {
     const hasAction = Math.random() < actionProbabilities[index];
     slot.dataset.state = hasAction
-      ? String(1 + Math.floor(Math.random() * (actions.length - 1)))
+      ? String(randomActionState())
       : '0';
   });
 }
