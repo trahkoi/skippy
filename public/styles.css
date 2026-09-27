@@ -1,8 +1,17 @@
 :root {
+  --amber-flame: #fcba04;
+  --inferno: #a50104;
+  --black-cherry: #590004;
+  --rich-mahogany: #250001;
+  --white-smoke: #f3f3f3;
+  --text-muted: color-mix(in srgb, var(--rich-mahogany) 72%, var(--white-smoke));
+  --border: color-mix(in srgb, var(--black-cherry) 28%, var(--white-smoke));
+  --shadow: color-mix(in srgb, var(--rich-mahogany) 8%, transparent);
+
   color-scheme: light;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  color: #283b34;
-  background: #f5f3ec;
+  color: var(--rich-mahogany);
+  background: var(--white-smoke);
   font-synthesis: none;
 }
 * {
@@ -22,7 +31,7 @@ button {
 button:focus-visible,
 a:focus-visible,
 summary:focus-visible {
-  outline: 3px solid #bb682f;
+  outline: 3px solid var(--rich-mahogany);
   outline-offset: 4px;
 }
 .masthead,
@@ -36,7 +45,7 @@ main,
   justify-content: space-between;
   align-items: center;
   padding-block: 28px;
-  border-bottom: 1px solid #d9ddd3;
+  border-bottom: 1px solid var(--border);
 }
 .brand {
   color: inherit;
@@ -46,14 +55,14 @@ main,
   letter-spacing: -1px;
 }
 .brand span {
-  color: #ad5c35;
+  color: var(--inferno);
   font-size: 25px;
   margin-right: 10px;
   letter-spacing: 0;
 }
 .tagline {
   font-size: 13px;
-  color: #637068;
+  color: var(--text-muted);
 }
 main {
   padding-top: 32px;
@@ -66,10 +75,10 @@ h1 {
   margin: 0;
 }
 .sheet {
-  background: #fffef9;
-  border: 1px solid #d9ddd3;
+  background: color-mix(in srgb, var(--white-smoke) 96%, var(--amber-flame));
+  border: 1px solid var(--border);
   border-radius: 12px;
-  box-shadow: 0 4px 14px #283b3404;
+  box-shadow: 0 4px 14px var(--shadow);
 }
 .sheet-heading {
   padding: 23px 28px;
@@ -77,11 +86,11 @@ h1 {
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  border-bottom: 1px solid #e6e8df;
+  border-bottom: 1px solid var(--border);
 }
 #block-count {
   font-size: 12px;
-  color: #657269;
+  color: var(--text-muted);
 }
 .blocks {
   display: flex;
@@ -108,14 +117,14 @@ h1 {
   font-size: 10px;
   text-transform: uppercase;
   letter-spacing: 1.5px;
-  color: #647268;
+  color: var(--text-muted);
   font-weight: 600;
 }
 .remove-button {
   border: 0;
   border-radius: 5px;
   background: transparent;
-  color: #6f786e;
+  color: var(--text-muted);
   width: 28px;
   height: 28px;
   font-size: 20px;
@@ -129,20 +138,20 @@ h1 {
 }
 .randomize-button,
 .print-button {
-  border: 1px solid #d4ddcc;
+  border: 1px solid var(--border);
   border-radius: 5px;
   background: transparent;
-  color: #304e3c;
+  color: var(--rich-mahogany);
   padding: 6px 8px;
   font-size: 11px;
 }
 .randomize-button:hover,
 .print-button:hover {
-  background: #e1ebd8;
+  background: var(--amber-flame);
 }
 .remove-button:hover {
-  background: #f3e6dc;
-  color: #924724;
+  background: var(--amber-flame);
+  color: var(--rich-mahogany);
 }
 .remove-button:disabled {
   visibility: hidden;
@@ -165,10 +174,10 @@ h1 {
   padding: 0;
   width: 100%;
   height: 58px;
-  border: 1px solid #dedfd3;
+  border: 1px solid var(--border);
   border-radius: 6px;
-  background: #fafaf4;
-  color: #304e3c;
+  background: var(--white-smoke);
+  color: var(--rich-mahogany);
   font-size: 0;
 }
 /* Keep the notation text and accessible labels, but draw symbols independently
@@ -185,7 +194,7 @@ h1 {
 .slot[data-state="0"]::after {
   width: 10px;
   height: 1px;
-  background: #bec5b8;
+  background: var(--text-muted);
 }
 .slot[data-state="1"]::after,
 .slot[data-state="2"]::after,
@@ -218,27 +227,27 @@ h1 {
   transform: translate(-50%, -50%) rotate(-25deg);
 }
 .position.is-count .slot {
-  background: #eaf0e4;
-  border-color: #d4ddcc;
+  background: var(--amber-flame);
+  border-color: var(--border);
 }
 .slot:hover {
-  border-color: #718d69;
-  background: #e1ebd8;
+  border-color: var(--rich-mahogany);
+  background: var(--amber-flame);
 }
 .slot[data-state="3"],
 .legend-mark[data-state="3"] {
-  color: #a75932;
+  color: var(--inferno);
 }
 .count {
-  color: #727b70;
+  color: var(--text-muted);
   font-size: 12px;
 }
 .is-count .count {
-  color: #304e3c;
+  color: var(--rich-mahogany);
   font-weight: 750;
 }
 .sheet-footer {
-  border-top: 1px solid #e6e8df;
+  border-top: 1px solid var(--border);
   padding: 18px 28px;
   display: flex;
   justify-content: flex-start;
@@ -247,9 +256,9 @@ h1 {
   gap: 16px;
 }
 .add-button {
-  border: 1px solid #304e3c;
-  background: #304e3c;
-  color: #fffef9;
+  border: 1px solid var(--inferno);
+  background: var(--inferno);
+  color: var(--white-smoke);
   border-radius: 6px;
   padding: 11px 16px;
   font-size: 13px;
@@ -258,14 +267,15 @@ h1 {
   margin-right: 7px;
 }
 .add-button:hover {
-  background: #203b2b;
+  background: var(--amber-flame);
+  color: var(--rich-mahogany);
 }
 .random-button {
   background: transparent;
-  color: #304e3c;
+  color: var(--black-cherry);
 }
 .random-button:hover {
-  background: #e1ebd8;
+  background: var(--amber-flame);
 }
 .legend {
   margin-top: 24px;
@@ -274,10 +284,10 @@ h1 {
   width: fit-content;
   cursor: pointer;
   font-size: 12px;
-  color: #637068;
+  color: var(--text-muted);
 }
 .legend > summary:hover {
-  color: #283b34;
+  color: var(--rich-mahogany);
 }
 dl {
   display: flex;
@@ -298,7 +308,7 @@ dt {
   gap: 8px;
   flex: 0 0 48px;
   height: 28px;
-  color: #304e3c;
+  color: var(--rich-mahogany);
 }
 .legend-mark {
   position: relative;
@@ -311,11 +321,11 @@ dt {
 dd {
   margin: 9px 0 0;
   font-size: 12px;
-  color: #68746a;
+  color: var(--text-muted);
 }
 .legend-note {
   font-size: 12px;
-  color: #68746a;
+  color: var(--text-muted);
   line-height: 1.7;
 }
 .page-footer {
@@ -324,9 +334,9 @@ dd {
   gap: 16px;
   padding-block: 24px;
   margin-top: 25px;
-  border-top: 1px solid #d9ddd3;
+  border-top: 1px solid var(--border);
   font-size: 11px;
-  color: #727b70;
+  color: var(--text-muted);
   line-height: 1.6;
 }
 .sr-only {
