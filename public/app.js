@@ -34,12 +34,10 @@ function updateBlocks() {
 
 function randomizeBlock(block) {
   const slots = [...block.querySelectorAll('.slot')];
-  slots.forEach(slot => {
-    slot.dataset.state = String(Math.floor(Math.random() * actions.length));
+  slots.forEach((slot, index) => {
+    const firstState = index % 3 === 2 ? 1 : 0;
+    slot.dataset.state = String(firstState + Math.floor(Math.random() * (actions.length - firstState)));
   });
-  if (slots.every(slot => slot.dataset.state === '0')) {
-    slots[Math.floor(Math.random() * slots.length)].dataset.state = String(1 + Math.floor(Math.random() * (actions.length - 1)));
-  }
 }
 
 function addBlock(focus = false, randomize = false) {
