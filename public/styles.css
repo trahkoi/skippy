@@ -117,6 +117,22 @@ h1 {
   height: 28px;
   font-size: 20px;
 }
+.block-controls {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.randomize-button {
+  border: 1px solid #d4ddcc;
+  border-radius: 5px;
+  background: transparent;
+  color: #304e3c;
+  padding: 6px 8px;
+  font-size: 11px;
+}
+.randomize-button:hover {
+  background: #e1ebd8;
+}
 .remove-button:hover {
   background: #f3e6dc;
   color: #924724;
@@ -218,7 +234,8 @@ h1 {
   border-top: 1px solid #e6e8df;
   padding: 18px 28px;
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-start;
+  flex-wrap: wrap;
   align-items: center;
   gap: 16px;
 }
@@ -235,6 +252,13 @@ h1 {
 }
 .add-button:hover {
   background: #203b2b;
+}
+.random-button {
+  background: transparent;
+  color: #304e3c;
+}
+.random-button:hover {
+  background: #e1ebd8;
 }
 .legend {
   margin-top: 24px;

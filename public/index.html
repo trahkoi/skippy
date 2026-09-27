@@ -5,8 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#f5f3ec">
   <title>Skippy — Rhythm sketchbook</title>
-  <link rel="stylesheet" href="styles.css?v=20260925-3">
-  <script src="app.js?v=20260925-2" defer></script>
+  <link rel="stylesheet" href="styles.css?v=20260927-1">
+  <script src="app.js?v=20260927-1" defer></script>
 </head>
 <body>
   <header class="masthead"><a class="brand" href="./"><span aria-hidden="true">● ∘</span> skippy</a><span class="tagline">A rhythm sketchbook</span></header>
@@ -14,11 +14,15 @@
     <section class="sheet" aria-labelledby="sheet-title">
       <div class="sheet-heading"><h1 id="sheet-title">Your rhythm</h1><span id="block-count">1 block · 2 beats</span></div>
       <div id="blocks" class="blocks"></div>
-      <div class="sheet-footer"><button id="add-block" class="add-button" type="button"><span aria-hidden="true">＋</span> Add two beats</button></div>
+      <div class="sheet-footer">
+        <button id="add-block" class="add-button" type="button"><span aria-hidden="true">＋</span> Add two beats</button>
+        <button id="random-block" class="add-button random-button" type="button"><span aria-hidden="true">⚄</span> Random two beats</button>
+      </div>
     </section>
     <details class="legend">
       <summary>Notation &amp; help</summary>
       <p class="legend-note">Click a slot to cycle through step, hop, action, and empty.</p>
+      <p class="legend-note">Randomize replaces a block’s slots with a random mix of steps, hops, actions, and empty slots. Random two beats adds a new random block. Click any slot to adjust it.</p>
       <dl>
         <div><dt><span class="legend-symbol" aria-hidden="true"><span class="legend-mark is-large" data-state="1"></span><span class="legend-mark" data-state="1"></span></span> Step</dt><dd>A step with a weight change</dd></div>
         <div><dt><span class="legend-symbol" aria-hidden="true"><span class="legend-mark is-large" data-state="2"></span><span class="legend-mark" data-state="2"></span></span> Hop</dt><dd>A hop on the supporting foot</dd></div>
@@ -32,7 +36,13 @@
   <footer class="page-footer">Not saved · clears on reload</footer>
   <template id="block-template">
     <section class="block">
-      <div class="block-heading"><h2></h2><button class="remove-button" type="button" title="Remove block">×</button></div>
+      <div class="block-heading">
+        <h2></h2>
+        <div class="block-controls">
+          <button class="randomize-button" type="button" title="Randomize this block’s actions">Randomize</button>
+          <button class="remove-button" type="button" title="Remove block">×</button>
+        </div>
+      </div>
       <div class="positions"></div>
     </section>
   </template>

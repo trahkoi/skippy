@@ -1,6 +1,7 @@
 const blocks = document.querySelector('#blocks');
 const template = document.querySelector('#block-template');
 const addButton = document.querySelector('#add-block');
+const randomButton = document.querySelector('#random-block');
 const actions = ['empty', 'step', 'hop', 'action without weight change'];
 const symbols = { small: ['', '•', '∘', '\\'], large: ['', '●', '◯', '\\'] };
 
@@ -24,13 +25,24 @@ function updateBlocks() {
     const remove = block.querySelector('.remove-button');
     remove.disabled = blocks.children.length === 1;
     remove.setAttribute('aria-label', `Remove block ${index + 1}`);
+    block.querySelector('.randomize-button')?.setAttribute('aria-label', `Randomize block ${index + 1}`);
     block.querySelectorAll('.slot').forEach((slot, position) => describeSlot(slot, index, position));
   });
   const count = blocks.children.length;
   document.querySelector('#block-count').textContent = `${count} ${count === 1 ? 'block' : 'blocks'} · ${count * 2} beats`;
 }
 
-function addBlock(focus = false) {
+function randomizeBlock(block) {
+  const slots = [...block.querySelectorAll('.slot')];
+  slots.forEach(slot => {
+    slot.dataset.state = String(Math.floor(Math.random() * actions.length));
+  });
+  if (slots.every(slot => slot.dataset.state === '0')) {
+    slots[Math.floor(Math.random() * slots.length)].dataset.state = String(1 + Math.floor(Math.random() * (actions.length - 1)));
+  }
+}
+
+function addBlock(focus = false, randomize = false) {
   const block = template.content.firstElementChild.cloneNode(true);
   const positions = block.querySelector('.positions');
   for (let index = 0; index < 6; index++) {
@@ -47,14 +59,22 @@ function addBlock(focus = false) {
     positions.append(position);
   }
   blocks.append(block);
+  if (randomize) randomizeBlock(block);
   updateBlocks();
   if (focus) {
     block.querySelector('.slot').focus();
-    document.querySelector('#status').textContent = `Block ${blocks.children.length} added.`;
+    document.querySelector('#status').textContent = `Block ${blocks.children.length} added${randomize ? ' with randomized actions' : ''}.`;
   }
 }
 
 blocks.addEventListener('click', (event) => {
+  const randomize = event.target.closest('.randomize-button');
+  if (randomize) {
+    const block = randomize.closest('.block');
+    randomizeBlock(block);
+    updateBlocks();
+    document.querySelector('#status').textContent = `Block ${[...blocks.children].indexOf(block) + 1} randomized.`;
+  }
   const slot = event.target.closest('.slot');
   if (slot) {
     slot.dataset.state = String((Number(slot.dataset.state) + 1) % 4);
@@ -72,4 +92,5 @@ blocks.addEventListener('click', (event) => {
   }
 });
 addButton.addEventListener('click', () => addBlock(true));
+randomButton?.addEventListener('click', () => addBlock(true, true));
 addBlock();
