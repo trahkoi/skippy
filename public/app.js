@@ -2,6 +2,8 @@ const blocks = document.querySelector('#blocks');
 const template = document.querySelector('#block-template');
 const addButton = document.querySelector('#add-block');
 const randomButton = document.querySelector('#random-block');
+const printingEnabled = new URLSearchParams(window.location.search).get('print') === '1';
+document.querySelector('#print-help').hidden = !printingEnabled;
 const actions = ['empty', 'step', 'hop', 'action without weight change'];
 const symbols = { small: ['', '•', '∘', '\\'], large: ['', '●', '◯', '\\'] };
 
@@ -26,6 +28,7 @@ function updateBlocks() {
     remove.disabled = blocks.children.length === 1;
     remove.setAttribute('aria-label', `Remove block ${index + 1}`);
     block.querySelector('.randomize-button')?.setAttribute('aria-label', `Randomize block ${index + 1}`);
+    block.querySelector('.print-button')?.setAttribute('aria-label', `Print block ${index + 1} or save as PDF`);
     block.querySelectorAll('.slot').forEach((slot, position) => describeSlot(slot, index, position));
   });
   const count = blocks.children.length;
@@ -42,6 +45,7 @@ function randomizeBlock(block) {
 
 function addBlock(focus = false, randomize = false) {
   const block = template.content.firstElementChild.cloneNode(true);
+  block.querySelector('.print-button').hidden = !printingEnabled;
   const positions = block.querySelector('.positions');
   for (let index = 0; index < 6; index++) {
     const position = document.createElement('div');
@@ -65,7 +69,29 @@ function addBlock(focus = false, randomize = false) {
   }
 }
 
+function clearPrintSelection() {
+  blocks.classList.remove('printing-block');
+  blocks.querySelector('.print-selected')?.classList.remove('print-selected');
+}
+
+// The dialog may be asynchronous, so keep the selection until it closes.
+window.addEventListener('afterprint', clearPrintSelection);
+
 blocks.addEventListener('click', (event) => {
+  const print = event.target.closest('.print-button');
+  if (print) {
+    if (!printingEnabled) return;
+    clearPrintSelection();
+    print.closest('.block').classList.add('print-selected');
+    blocks.classList.add('printing-block');
+    try {
+      window.print();
+    } catch (error) {
+      clearPrintSelection();
+      document.querySelector('#status').textContent = 'Printing could not open. Try your browser’s Print command.';
+    }
+    return;
+  }
   const randomize = event.target.closest('.randomize-button');
   if (randomize) {
     const block = randomize.closest('.block');

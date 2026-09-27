@@ -96,11 +96,14 @@ h1 {
 }
 .block-heading {
   display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 12px;
 }
 .block h2 {
+  white-space: nowrap;
   margin: 0;
   font-size: 10px;
   text-transform: uppercase;
@@ -119,10 +122,13 @@ h1 {
 }
 .block-controls {
   display: flex;
+  flex-shrink: 0;
+  white-space: nowrap;
   align-items: center;
   gap: 6px;
 }
-.randomize-button {
+.randomize-button,
+.print-button {
   border: 1px solid #d4ddcc;
   border-radius: 5px;
   background: transparent;
@@ -130,7 +136,8 @@ h1 {
   padding: 6px 8px;
   font-size: 11px;
 }
-.randomize-button:hover {
+.randomize-button:hover,
+.print-button:hover {
   background: #e1ebd8;
 }
 .remove-button:hover {
@@ -359,5 +366,119 @@ dd {
   .page-footer {
     flex-direction: column;
     gap: 6px;
+  }
+}
+
+@page {
+  size: A4 landscape;
+  /* Keep spacing inside the block, leaving no page-margin area for the
+     browser's automatic headers and footers. */
+  margin: 0;
+}
+
+@media print {
+  :root,
+  body {
+    background: white;
+    color: black;
+  }
+  .masthead,
+  .sheet-heading,
+  .sheet-footer,
+  .block-heading,
+  .block-controls,
+  .legend,
+  .page-footer,
+  #status,
+  noscript,
+  .printing-block .block:not(.print-selected) {
+    display: none;
+  }
+  main {
+    width: 100%;
+    margin: 0;
+    padding: 0;
+  }
+  .sheet {
+    background: white;
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
+  }
+  .blocks {
+    display: block;
+    padding: 0;
+    min-height: 0;
+  }
+  .block {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    width: 100%;
+    max-width: 100%;
+    /* Match the 210mm A4 landscape page explicitly: some browsers resolve
+       print viewport units using a different height. Leave 1mm for rounding. */
+    height: 209mm;
+    padding: 15mm;
+    margin: 0;
+    break-inside: avoid;
+    break-after: page;
+  }
+  .block:last-child,
+  .printing-block .print-selected {
+    break-after: auto;
+  }
+  .positions {
+    gap: 3mm;
+  }
+  .position {
+    gap: 8mm;
+  }
+  .slot,
+  .slot[data-state],
+  .position.is-count .slot {
+    height: 40mm;
+    background: transparent;
+    border: 0;
+    color: black;
+    outline: none;
+  }
+  .count,
+  .is-count .count {
+    color: black;
+    font-size: 28pt;
+  }
+  /* Borders print even when the browser omits background graphics. */
+  .slot[data-state="0"]::after {
+    width: 8mm;
+    height: 0;
+    background: none;
+    border-top: 0.5mm solid currentColor;
+  }
+  .slot[data-state="1"]::after,
+  .slot[data-state="2"]::after {
+    width: 10mm;
+    height: 10mm;
+  }
+  .is-count .slot[data-state="1"]::after,
+  .is-count .slot[data-state="2"]::after {
+    width: 30mm;
+    height: 30mm;
+  }
+  .slot[data-state="2"]::after {
+    border-width: 1mm;
+  }
+  .slot[data-state="1"]::after {
+    background: none;
+    border: 5mm solid currentColor;
+  }
+  .is-count .slot[data-state="1"]::after {
+    border-width: 15mm;
+  }
+  .slot[data-state="3"]::after {
+    width: 0;
+    height: 30mm;
+    background: none;
+    border-left: 1.5mm solid currentColor;
   }
 }

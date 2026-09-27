@@ -5,8 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#f5f3ec">
   <title>Skippy — Rhythm sketchbook</title>
-  <link rel="stylesheet" href="styles.css?v=20260927-1">
-  <script src="app.js?v=20260927-2" defer></script>
+  <link rel="stylesheet" href="styles.css?v=20260927-6">
+  <script src="app.js?v=20260927-7" defer></script>
 </head>
 <body>
   <header class="masthead"><a class="brand" href="./"><span aria-hidden="true">● ∘</span> skippy</a><span class="tagline">A rhythm sketchbook</span></header>
@@ -29,6 +29,7 @@
         <div><dt><span class="legend-symbol" aria-hidden="true"><span class="legend-mark is-large" data-state="3"></span></span> Action</dt><dd>No weight change, like a kick</dd></div>
       </dl>
       <p class="legend-note">Large symbols on numbered counts. Small symbols on <em>&amp;</em> and <em>a</em>. An action can go anywhere.</p>
+      <p id="print-help" class="legend-note" hidden>Print / PDF prints only the block’s symbols and count labels. Choose Save as PDF in your browser’s print dialog to keep a copy. If the title, address, date, or page numbers appear, turn off Headers and footers in the print settings.</p>
     </details>
     <p id="status" class="sr-only" role="status"></p>
     <noscript><p>Enable JavaScript to place symbols and add rhythm blocks.</p></noscript>
@@ -39,6 +40,7 @@
       <div class="block-heading">
         <h2></h2>
         <div class="block-controls">
+          <button class="print-button" type="button" title="Print this block or save it as PDF" hidden>Print / PDF</button>
           <button class="randomize-button" type="button" title="Randomize this block’s actions">Randomize</button>
           <button class="remove-button" type="button" title="Remove block">×</button>
         </div>
