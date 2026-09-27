@@ -1,5 +1,7 @@
 # Deploy Skippy to Hetzner with Cloudflare DNS
 
+The live site at `https://skippy.dancelot.dev` now uses Cloudflare's proxy and Caddy's root is `/srv/skippy/current`. See [continuous deployment](CONTINUOUS_DEPLOYMENT.md) for its provisioner and release workflow. The steps below describe an initial setup using DNS-only records; do not reset the live configuration to repeat them.
+
 Skippy consists of `index.html`, `styles.css`, and `app.js`. Upload those files to your VM and serve them with Caddy. There is no build step, backend, database, or Node.js process to run. Rhythms currently live only in the browser's memory and disappear on reload; deploying the app does not add saving.
 
 This guide assumes **Ubuntu 24.04 LTS**, SSH access with an account that can use `sudo`, and a public IPv4 address. Run the commands one block at a time, checking for errors before continuing. If your VM uses another distribution, adapt the package installation steps. If it already hosts websites, preserve their configuration and check which service owns ports 80 and 443 before installing Caddy.
@@ -61,11 +63,11 @@ If you use a Hetzner Cloud Firewall, attach it to this VM and allow these inboun
 
 | Protocol | Port | Source | Purpose |
 | --- | --- | --- | --- |
-| TCP | 22, or your actual SSH port | Your public IP (`/32` for IPv4) | Administration |
+| TCP | 22, or your actual SSH port | Any IPv4 and IPv6 address | Key-authenticated administration and deployment |
 | TCP | 80 | Any IPv4 and IPv6 address | HTTP and certificate validation |
 | TCP | 443 | Any IPv4 and IPv6 address | HTTPS |
 
-Keep the SSH rule aligned with your current public IP; update it when your IP changes. Preserve rules needed by any existing services. Hetzner Cloud Firewalls block unmatched inbound traffic, while outbound traffic is allowed when no outbound rules are configured. For this setup, leave outbound traffic allowed. See [Hetzner's firewall documentation](https://docs.hetzner.com/cloud/firewalls/faq/).
+SSH on this server is not restricted to your laptop's IP. GitHub Actions can connect directly using a deployment SSH key; no VPN or Tailscale is required. Preserve rules needed by existing services. Hetzner Cloud Firewalls block unmatched inbound traffic, while outbound traffic is allowed when no outbound rules are configured. For this setup, leave outbound traffic allowed. See [Hetzner's firewall documentation](https://docs.hetzner.com/cloud/firewalls/faq/).
 
 Connect from **your Mac**, keeping the session open while checking firewall access:
 
@@ -210,6 +212,8 @@ Expect an HTTP redirect to HTTPS, followed by `200` responses for the HTTPS page
 - Reloading clears the rhythm, as expected for the current app.
 
 ## 8. Publish later updates
+
+For automatic deployment from GitHub, follow [CONTINUOUS_DEPLOYMENT.md](CONTINUOUS_DEPLOYMENT.md). Once enabled, use that workflow instead of the manual copies below; Caddy will serve `/srv/skippy/current`.
 
 Before uploading a changed `app.js` or `styles.css`, update its `?v=` value in `index.html` to a new release identifier (for example, `20260925-3`). This gives browsers and caches a new asset URL. Upload all three files together, and install `styles.css` and `app.js` before `index.html` so the new page references files that are already present.
 

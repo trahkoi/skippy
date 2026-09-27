@@ -1,0 +1,222 @@
+---
+- name: Provision continuous deployment on the existing Skippy VM
+  hosts: skippy
+  gather_facts: false
+  vars:
+    skippy_files: [index.html, styles.css, app.js]
+    caddy_root_pattern: '(?m)(^{{ skippy_domain | regex_escape }}[ \t]*\{\n[^{}]*?^[ \t]*root[ \t]+\*[ \t]+){{ skippy_root | regex_escape }}(?:/current)?([ \t]*$)'
+
+  pre_tasks:
+    - name: Inspect the existing site and current release
+      ansible.builtin.stat:
+        path: '{{ item }}'
+      loop:
+        - '{{ skippy_root }}'
+        - '{{ skippy_root }}/current'
+      register: site_paths
+
+    - name: Require the expected existing site layout
+      ansible.builtin.assert:
+        that:
+          - site_paths.results[0].stat.isdir | default(false)
+          - not (site_paths.results[0].stat.islnk | default(false))
+          - not site_paths.results[1].stat.exists or (site_paths.results[1].stat.islnk | default(false))
+          - not site_paths.results[1].stat.exists or (site_paths.results[1].stat.lnk_source | default('')).startswith(skippy_root + '/releases/')
+        fail_msg: Inspect the existing site layout before provisioning.
+
+    - name: Read existing Caddy configuration
+      ansible.builtin.slurp:
+        src: /etc/caddy/Caddyfile
+      register: caddy_original
+
+    - name: Require one explicit Skippy site and root directive
+      ansible.builtin.assert:
+        that:
+          - (caddy_original.content | b64decode | regex_findall(caddy_root_pattern) | length) == 1
+        fail_msg: Unexpected Caddy layout; refusing to alter other sites.
+
+    - name: Read the existing live files for comparison after provisioning
+      ansible.builtin.slurp:
+        src: "{{ skippy_root }}{{ '/current' if site_paths.results[1].stat.exists else '' }}/{{ item }}"
+      loop: '{{ skippy_files }}'
+      register: original_site
+
+  tasks:
+    - name: Ensure deployment runtime tools are installed
+      ansible.builtin.apt:
+        name: [python3, curl]
+        state: present
+
+    - name: Create deployment group
+      ansible.builtin.group:
+        name: '{{ skippy_deploy_user }}'
+
+    - name: Create deployment account with password login locked
+      ansible.builtin.user:
+        name: '{{ skippy_deploy_user }}'
+        group: '{{ skippy_deploy_user }}'
+        home: '/home/{{ skippy_deploy_user }}'
+        shell: /bin/bash
+        create_home: true
+        password_lock: true
+
+    - name: Create a dedicated key on the controller only when absent
+      ansible.builtin.command:
+        argv:
+          - ssh-keygen
+          - -q
+          - -t
+          - ed25519
+          - -N
+          - ''
+          - -C
+          - skippy-github-actions
+          - -f
+          - '{{ skippy_key_path }}'
+        creates: '{{ skippy_key_path }}'
+      delegate_to: localhost
+      vars:
+        ansible_python_interpreter: '{{ ansible_playbook_python }}'
+
+    - name: Install deployment public key without removing existing keys
+      ansible.posix.authorized_key:
+        user: '{{ skippy_deploy_user }}'
+        key: "{{ lookup('file', skippy_key_path + '.pub') }}"
+        key_options: restrict
+        exclusive: false
+
+    - name: Set ownership of deployment directories
+      ansible.builtin.file:
+        path: '{{ item }}'
+        state: directory
+        owner: '{{ skippy_deploy_user }}'
+        group: '{{ skippy_deploy_user }}'
+        mode: '0755'
+      loop:
+        - '{{ skippy_root }}'
+        - '{{ skippy_root }}/releases'
+
+    - name: Preserve the initial site before switching to releases
+      when: not site_paths.results[1].stat.exists
+      block:
+        - name: Create bootstrap directory
+          ansible.builtin.file:
+            path: '{{ skippy_root }}/releases/bootstrap'
+            state: directory
+            owner: '{{ skippy_deploy_user }}'
+            group: '{{ skippy_deploy_user }}'
+            mode: '0755'
+
+        - name: Copy existing public files into bootstrap
+          ansible.builtin.copy:
+            src: '{{ skippy_root }}/{{ item }}'
+            dest: '{{ skippy_root }}/releases/bootstrap/{{ item }}'
+            remote_src: true
+            owner: '{{ skippy_deploy_user }}'
+            group: '{{ skippy_deploy_user }}'
+            mode: '0644'
+          loop: '{{ skippy_files }}'
+
+        - name: Point current at the preserved site
+          ansible.builtin.file:
+            src: releases/bootstrap
+            dest: '{{ skippy_root }}/current'
+            state: link
+            force: false
+
+    - name: Update Caddy and verify that the site is preserved
+      block:
+        - name: Update only the Skippy root after validating the complete Caddyfile
+          ansible.builtin.replace:
+            path: /etc/caddy/Caddyfile
+            regexp: '{{ caddy_root_pattern }}'
+            replace: '\g<1>{{ skippy_root }}/current\g<2>'
+            backup: true
+            validate: /usr/bin/caddy validate --config %s --adapter caddyfile
+          register: caddy_update
+
+        - name: Reload Caddy only if its configuration changed
+          ansible.builtin.systemd_service:
+            name: caddy
+            state: reloaded
+          when: caddy_update.changed
+
+        - name: Check local Caddy over HTTPS with the real certificate
+          ansible.builtin.command:
+            argv:
+              - curl
+              - --fail
+              - --silent
+              - --show-error
+              - --noproxy
+              - '*'
+              - --max-time
+              - '15'
+              - --resolve
+              - '{{ skippy_domain }}:443:127.0.0.1'
+              - 'https://{{ skippy_domain }}/{{ item.item }}'
+            strip_empty_ends: false
+          loop: '{{ original_site.results }}'
+          loop_control:
+            label: '{{ item.item }}'
+          register: origin_check
+          changed_when: false
+          failed_when: origin_check.rc != 0 or origin_check.stdout != (item.content | b64decode)
+          check_mode: false
+
+      rescue:
+        - name: Restore the previous Caddyfile if it was changed
+          ansible.builtin.copy:
+            src: '{{ caddy_update.backup_file }}'
+            dest: /etc/caddy/Caddyfile
+            remote_src: true
+            mode: preserve
+          when: caddy_update.backup_file is defined
+
+        - name: Reload restored Caddy configuration
+          ansible.builtin.systemd_service:
+            name: caddy
+            state: reloaded
+          when: caddy_update.backup_file is defined
+
+        - name: Report the failed provisioning check
+          ansible.builtin.fail:
+            msg: Caddy verification failed. Any changed Caddyfile was restored; inspect the failure above.
+
+    - name: Read the server public host key through trusted SSH
+      ansible.builtin.slurp:
+        src: /etc/ssh/ssh_host_ed25519_key.pub
+      register: server_host_key
+
+    - name: Save the verified known-hosts entry on the controller
+      ansible.builtin.copy:
+        content: "{{ ansible_host }} {{ (server_host_key.content | b64decode).split()[:2] | join(' ') }}\n"
+        dest: '{{ skippy_key_path }}.known_hosts'
+        mode: '0600'
+      delegate_to: localhost
+      vars:
+        ansible_python_interpreter: '{{ ansible_playbook_python }}'
+
+    - name: Verify deployment account access without administrative privileges
+      ansible.builtin.command:
+        argv:
+          - ssh
+          - -i
+          - '{{ skippy_key_path }}'
+          - -o
+          - IdentitiesOnly=yes
+          - -o
+          - BatchMode=yes
+          - -o
+          - StrictHostKeyChecking=yes
+          - -o
+          - 'UserKnownHostsFile={{ skippy_key_path }}.known_hosts'
+          - -o
+          - ConnectTimeout=15
+          - '{{ skippy_deploy_user }}@{{ ansible_host }}'
+          - 'test -w {{ skippy_root | quote }} && test -r {{ (skippy_root + "/current/index.html") | quote }} && python3 --version'
+      delegate_to: localhost
+      vars:
+        ansible_python_interpreter: '{{ ansible_playbook_python }}'
+      changed_when: false
+      when: not ansible_check_mode

@@ -1,0 +1,13 @@
+---
+all:
+  children:
+    skippy:
+      hosts:
+        production:
+          ansible_host: 62.238.3.212
+          ansible_user: root
+      vars:
+        skippy_domain: skippy.dancelot.dev
+        skippy_root: /srv/skippy
+        skippy_deploy_user: skippy-deploy
+        skippy_key_path: "{{ lookup('env', 'HOME') }}/.ssh/skippy_github_actions"

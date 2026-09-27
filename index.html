@@ -5,38 +5,34 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#f5f3ec">
   <title>Skippy — Rhythm sketchbook</title>
-  <link rel="stylesheet" href="styles.css?v=20260925-2">
+  <link rel="stylesheet" href="styles.css?v=20260925-3">
   <script src="app.js?v=20260925-2" defer></script>
 </head>
 <body>
   <header class="masthead"><a class="brand" href="./"><span aria-hidden="true">● ∘</span> skippy</a><span class="tagline">A rhythm sketchbook</span></header>
   <main>
-    <section class="intro" aria-labelledby="page-title">
-      <p class="eyebrow">MAKE ROOM FOR RHYTHM</p>
-      <h1 id="page-title">Every move has a place.</h1>
-      <p>Build your rhythm, two beats at a time.<br>Click a slot to cycle through step, hop, action, and empty.</p>
-    </section>
     <section class="sheet" aria-labelledby="sheet-title">
-      <div class="sheet-heading"><h2 id="sheet-title">Your rhythm</h2><span id="block-count">1 block · 2 beats</span></div>
+      <div class="sheet-heading"><h1 id="sheet-title">Your rhythm</h1><span id="block-count">1 block · 2 beats</span></div>
       <div id="blocks" class="blocks"></div>
-      <div class="sheet-footer"><button id="add-block" class="add-button" type="button"><span aria-hidden="true">＋</span> Add two beats</button><p>&amp; a 1 · &amp; a 2 · keep going</p></div>
+      <div class="sheet-footer"><button id="add-block" class="add-button" type="button"><span aria-hidden="true">＋</span> Add two beats</button></div>
     </section>
-    <aside class="legend" aria-labelledby="legend-title">
-      <h2 id="legend-title">The notation</h2>
+    <details class="legend">
+      <summary>Notation &amp; help</summary>
+      <p class="legend-note">Click a slot to cycle through step, hop, action, and empty.</p>
       <dl>
-        <div><dt><span class="legend-symbol" aria-hidden="true">● •</span> Step</dt><dd>A step with a weight change</dd></div>
-        <div><dt><span class="legend-symbol" aria-hidden="true">◯ ∘</span> Hop</dt><dd>A hop on the supporting foot</dd></div>
-        <div><dt><span class="legend-symbol" aria-hidden="true">\</span> Action</dt><dd>No weight change, like a kick</dd></div>
+        <div><dt><span class="legend-symbol" aria-hidden="true"><span class="legend-mark is-large" data-state="1"></span><span class="legend-mark" data-state="1"></span></span> Step</dt><dd>A step with a weight change</dd></div>
+        <div><dt><span class="legend-symbol" aria-hidden="true"><span class="legend-mark is-large" data-state="2"></span><span class="legend-mark" data-state="2"></span></span> Hop</dt><dd>A hop on the supporting foot</dd></div>
+        <div><dt><span class="legend-symbol" aria-hidden="true"><span class="legend-mark is-large" data-state="3"></span></span> Action</dt><dd>No weight change, like a kick</dd></div>
       </dl>
       <p class="legend-note">Large symbols on numbered counts. Small symbols on <em>&amp;</em> and <em>a</em>. An action can go anywhere.</p>
-    </aside>
+    </details>
     <p id="status" class="sr-only" role="status"></p>
     <noscript><p>Enable JavaScript to place symbols and add rhythm blocks.</p></noscript>
   </main>
-  <footer class="page-footer"><span>Small marks. Endless possibilities.</span><span>A sketch for this session · saving coming later</span></footer>
+  <footer class="page-footer">Not saved · clears on reload</footer>
   <template id="block-template">
     <section class="block">
-      <div class="block-heading"><h3></h3><button class="remove-button" type="button" title="Remove block">×</button></div>
+      <div class="block-heading"><h2></h2><button class="remove-button" type="button" title="Remove block">×</button></div>
       <div class="positions"></div>
     </section>
   </template>
