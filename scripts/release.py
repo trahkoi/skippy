@@ -131,7 +131,7 @@ def main():
     pack = commands.add_parser("package")
     pack.add_argument("revision")
     pack.add_argument("output", type=Path)
-    pack.add_argument("--source", type=Path, default=Path("."))
+    pack.add_argument("--source", type=Path, default=Path("public"), help="Site directory (default: public)")
     publish = commands.add_parser("deploy")
     publish.add_argument("revision")
     publish.add_argument("archive", type=Path)

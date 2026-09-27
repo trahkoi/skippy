@@ -2,7 +2,17 @@
 
 A lightweight rhythm sketchbook made with plain HTML, CSS, and a little JavaScript. No dependencies, build step, or network connection needed.
 
-Open `index.html` in your browser.
+Open `public/index.html` in your browser.
+
+Project layout:
+
+- `public/` — HTML, CSS, and JavaScript served to browsers.
+- `scripts/` — release packaging and deployment tools.
+- `tests/` — release and deployment tests.
+- `ansible/` — server provisioning.
+- `.github/workflows/` — automated validation and deployment.
+
+Run commands from the repository root. Release packaging reads from `public/` by default.
 
 - Click a slot (or focus it and press Space/Enter) to cycle through empty → step → hop → action → empty.
 - Numbered counts use ● and ◯. The “&” and “a” subdivisions use • and ∘. A backslash represents an action without a weight change on any subdivision.

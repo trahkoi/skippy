@@ -22,7 +22,7 @@ class ReleaseTests(unittest.TestCase):
         self.temporary = tempfile.TemporaryDirectory()
         self.addCleanup(self.temporary.cleanup)
         self.root = Path(self.temporary.name)
-        self.source = self.root / "source"
+        self.source = self.root / "public"
         self.source.mkdir()
         (self.source / "index.html").write_text('<link href="styles.css?v=old"><script src="app.js?v=old"></script>')
         (self.source / "styles.css").write_text("body { color: black; }")

@@ -39,7 +39,7 @@ def main():
         known_hosts = work / "known_hosts"
         known_hosts.write_text(os.environ["DEPLOY_KNOWN_HOSTS"].rstrip() + "\n")
         archive = work / "site.tar.gz"
-        package(Path("."), archive, revision)
+        package(Path("public"), archive, revision)
         options = ["-i", str(key), "-o", "IdentitiesOnly=yes", "-o", "BatchMode=yes",
                    "-o", "StrictHostKeyChecking=yes", "-o", f"UserKnownHostsFile={known_hosts}",
                    "-o", "ConnectTimeout=15", "-o", "ServerAliveInterval=15", "-o", "ServerAliveCountMax=4"]
