@@ -103,6 +103,16 @@ h1 {
   flex: 0 0 256px;
   min-width: 0;
 }
+.block.phrase {
+  flex-basis: 100%;
+  max-width: none;
+  padding: 16px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+.phrase .positions {
+  grid-template-columns: repeat(18, minmax(0, 1fr));
+}
 .block-heading {
   display: flex;
   flex-wrap: wrap;
@@ -347,6 +357,13 @@ dd {
   clip-path: inset(50%);
   white-space: nowrap;
 }
+@media (max-width: 1000px) {
+  .phrase .positions {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    row-gap: 24px;
+  }
+}
+
 @media (max-width: 650px) {
   .masthead,
   main,
@@ -433,6 +450,22 @@ dd {
     margin: 0;
     break-inside: avoid;
     break-after: page;
+  }
+  .block.phrase {
+    padding: 15mm;
+    border: 0;
+    border-radius: 0;
+  }
+  .phrase .positions {
+    grid-template-columns: repeat(18, minmax(0, 1fr));
+    gap: 1mm;
+  }
+  .phrase .slot[data-state]::after {
+    scale: 0.35;
+    transform-origin: 0 0;
+  }
+  .phrase .count {
+    font-size: 18pt;
   }
   .block:last-child,
   .printing-block .print-selected {
