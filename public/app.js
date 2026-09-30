@@ -3,6 +3,7 @@ const template = document.querySelector('#block-template');
 const addButton = document.querySelector('#add-block');
 const randomButton = document.querySelector('#random-block');
 const sequenceButton = document.querySelector('#random-six-counts');
+const clearButton = document.querySelector('#clear-rhythm');
 let rhythmStarted = false;
 const queryParams = new URLSearchParams(window.location.search);
 const beatToolsEnabled = queryParams.get('showBeatTools') === 'true';
@@ -140,6 +141,14 @@ blocks.addEventListener('click', (event) => {
   }
 });
 addButton.addEventListener('click', () => addBlock(true));
+clearButton.addEventListener('click', () => {
+  clearPrintSelection();
+  blocks.replaceChildren();
+  rhythmStarted = false;
+  addBlock();
+  blocks.querySelector('.slot').focus();
+  document.querySelector('#status').textContent = 'Rhythm cleared. One empty block ready.';
+});
 randomButton?.addEventListener('click', () => addBlock(true, true));
 sequenceButton?.addEventListener('click', () => {
   if (!rhythmStarted) {
