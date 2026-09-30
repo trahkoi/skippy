@@ -65,7 +65,7 @@ function randomizeBlock(block) {
   });
 }
 
-function addBlock(focus = false, randomize = false) {
+function addBlock(focus = false, randomize = false, states = '000000', update = true) {
   const block = template.content.firstElementChild.cloneNode(true);
   block.querySelector('.print-button').hidden = !printingEnabled;
   const positions = block.querySelector('.positions');
@@ -75,7 +75,7 @@ function addBlock(focus = false, randomize = false) {
     const slot = document.createElement('button');
     slot.type = 'button';
     slot.className = 'slot';
-    slot.dataset.state = '0';
+    slot.dataset.state = states[index];
     const label = document.createElement('span');
     label.className = 'count';
     label.setAttribute('aria-hidden', 'true');
@@ -84,7 +84,7 @@ function addBlock(focus = false, randomize = false) {
   }
   blocks.append(block);
   if (randomize) randomizeBlock(block);
-  updateBlocks();
+  if (update) updateBlocks();
   if (focus) {
     rhythmStarted = true;
     block.querySelector('.slot').focus();
@@ -161,4 +161,96 @@ sequenceButton?.addEventListener('click', () => {
   blocks.children[firstNewBlock].querySelector('.slot').focus();
   document.querySelector('#status').textContent = 'Six random counts generated as three two-beat blocks.';
 });
+// Version 1: six base-4 digits per block, in display order. The fragment stays
+// in the browser and is never included in HTTP requests to the static host.
+const maxSharedBlocks = 1000;
+
+function rhythmFromHash(hash) {
+  if (!hash.startsWith('#rhythm=')) return null;
+  const payload = hash.slice('#rhythm='.length);
+  if (!payload.startsWith('1.') || payload.length > 2 + maxSharedBlocks * 6) {
+    throw new Error('Unsupported or oversized rhythm');
+  }
+  const states = payload.slice(2);
+  if (!states.length || states.length % 6 !== 0 || /[^0-3]/.test(states)) {
+    throw new Error('Invalid rhythm');
+  }
+  return states.match(/.{6}/g);
+}
+
+function loadSharedRhythm() {
+  try {
+    const sharedBlocks = rhythmFromHash(window.location.hash);
+    if (!sharedBlocks) return;
+    clearPrintSelection();
+    blocks.replaceChildren();
+    sharedBlocks.forEach(states => addBlock(false, false, states, false));
+    updateBlocks();
+    // Even an empty shared rhythm is an intentional rhythm, not a fresh sheet.
+    rhythmStarted = true;
+    document.querySelector('#share-result').hidden = true;
+    document.querySelector('#status').textContent = 'Shared rhythm loaded. You can edit it and share your own copy.';
+  } catch (error) {
+    document.querySelector('#status').textContent = 'This rhythm link is invalid, unsupported, or too large. Your current rhythm has not been changed.';
+  }
+}
+
+async function copyRhythmLink(text) {
+  if (navigator.clipboard?.writeText) {
+    try {
+      await navigator.clipboard.writeText(text);
+      return true;
+    } catch (error) {
+      // Try selected-text copying when the asynchronous API is blocked.
+    }
+  }
+  const previousFocus = document.activeElement;
+  const copyField = document.createElement('textarea');
+  copyField.value = text;
+  copyField.readOnly = true;
+  // It must remain rendered and selectable for Firefox's copy command.
+  copyField.style.cssText = 'position:fixed;left:-9999px;top:0;';
+  document.body.append(copyField);
+  try {
+    copyField.focus({ preventScroll: true });
+    copyField.select();
+    return document.execCommand('copy');
+  } catch (error) {
+    return false;
+  } finally {
+    copyField.remove();
+    previousFocus?.focus({ preventScroll: true });
+  }
+}
+
+document.querySelector('#share-rhythm').addEventListener('click', async () => {
+  const status = document.querySelector('#status');
+  if (blocks.children.length > maxSharedBlocks) {
+    status.textContent = `Share links support up to ${maxSharedBlocks} blocks. Remove some blocks and try again.`;
+    return;
+  }
+  const states = [...blocks.querySelectorAll('.slot')].map(slot => slot.dataset.state).join('');
+  const url = new URL(window.location.href);
+  url.hash = `rhythm=1.${states}`;
+  const field = document.querySelector('#share-url');
+  const result = document.querySelector('#share-result');
+  field.value = url.href;
+  result.hidden = true;
+  if (url.protocol === 'file:') {
+    status.textContent = 'This link points to a file on your device. Open the hosted app to create a link that other people can use.';
+    return;
+  }
+  status.textContent = 'Copying rhythm link…';
+  if (await copyRhythmLink(url.href)) {
+    status.textContent = 'Rhythm link copied. Paste it to share your rhythm.';
+  } else {
+    result.hidden = false;
+    field.focus();
+    field.select();
+    status.textContent = 'Copy the selected link to share your rhythm. Automatic copying is unavailable in this browser.';
+  }
+});
+document.querySelector('#share-url').addEventListener('click', event => event.target.select());
+window.addEventListener('hashchange', loadSharedRhythm);
 addBlock();
+loadSharedRhythm();

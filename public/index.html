@@ -5,8 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#f3f3f3">
   <title>Skippy — Rhythm sketchbook</title>
-  <link rel="stylesheet" href="styles.css?v=20260930-3">
-  <script src="app.js?v=20260930-2" defer></script>
+  <link rel="stylesheet" href="styles.css?v=20260930-6">
+  <script src="app.js?v=20260930-8" defer></script>
 </head>
 <body>
   <header class="masthead"><a class="brand" href="./"><span aria-hidden="true">● ∘</span> skippy</a><span class="tagline">A rhythm sketchbook</span></header>
@@ -19,12 +19,21 @@
         <button id="random-block" class="add-button random-button" type="button" hidden><span aria-hidden="true">⚄</span> Random two beats</button>
         <button id="random-six-counts" class="add-button random-button" type="button">6-count</button>
         <button id="clear-rhythm" class="add-button random-button" type="button">Clear</button>
+        <button id="share-rhythm" class="add-button share-button" type="button" aria-label="Share rhythm" title="Share rhythm">
+          <svg class="control-icon" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false"><path d="M12 15V2m-4 4 4-4 4 4M8 9H5v12h14V9h-3"/></svg>
+        </button>
+        <p id="status" role="status"></p>
+      </div>
+      <div id="share-result" class="share-result" hidden>
+        <label for="share-url">Rhythm link — a snapshot from when you clicked Share</label>
+        <input id="share-url" type="text" readonly spellcheck="false">
       </div>
     </section>
     <details class="legend">
       <summary>Notation &amp; help</summary>
       <p class="legend-note">Click a slot to cycle through step, hop, action, and empty.</p>
       <p class="legend-note">Clear resets your rhythm to one empty block.</p>
+      <p class="legend-note">Share rhythm copies a link that opens an editable copy of your rhythm. Share again after making changes to create an updated link. Nothing is saved on a server.</p>
       <p class="legend-note">⟳ (Randomize) replaces a block’s slots with a random mix of steps, hops, and actions. Numbered beats always have a symbol; &amp; and a may be empty. <span id="beat-tools-help" hidden>Add two beats adds a new empty block. Random two beats adds a new random block. </span>6-count adds three random two-beat blocks. On an untouched sheet, it replaces the starting empty block; otherwise it appends to your rhythm. Click any slot to adjust it.</p>
       <dl>
         <div><dt><span class="legend-symbol" aria-hidden="true"><span class="legend-mark is-large" data-state="1"></span><span class="legend-mark" data-state="1"></span></span> Step</dt><dd>A step with a weight change</dd></div>
@@ -34,10 +43,9 @@
       <p class="legend-note">Large symbols on numbered counts. Small symbols on <em>&amp;</em> and <em>a</em>. An action can go anywhere.</p>
       <p id="print-help" class="legend-note" hidden>Print / PDF prints only the block’s symbols and count labels. Choose Save as PDF in your browser’s print dialog to keep a copy. If the title, address, date, or page numbers appear, turn off Headers and footers in the print settings.</p>
     </details>
-    <p id="status" class="sr-only" role="status"></p>
     <noscript><p>Enable JavaScript to place symbols and add rhythm blocks.</p></noscript>
   </main>
-  <footer class="page-footer">Not saved · clears on reload</footer>
+  <footer class="page-footer">Keep a share link to save a rhythm · edits are not saved automatically</footer>
   <template id="block-template">
     <section class="block">
       <div class="block-heading">
