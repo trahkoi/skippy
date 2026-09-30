@@ -4,7 +4,12 @@ const addButton = document.querySelector('#add-block');
 const randomButton = document.querySelector('#random-block');
 const sequenceButton = document.querySelector('#random-six-counts');
 let rhythmStarted = false;
-const printingEnabled = new URLSearchParams(window.location.search).get('print') === '1';
+const queryParams = new URLSearchParams(window.location.search);
+const beatToolsEnabled = queryParams.get('showBeatTools') === 'true';
+addButton.hidden = !beatToolsEnabled;
+randomButton.hidden = !beatToolsEnabled;
+document.querySelector('#beat-tools-help').hidden = !beatToolsEnabled;
+const printingEnabled = queryParams.get('print') === '1';
 document.querySelector('#print-help').hidden = !printingEnabled;
 const actions = ['empty', 'step', 'hop', 'action without weight change'];
 // Probability of a symbol at each position: & a 1 & a 2.

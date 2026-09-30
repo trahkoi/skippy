@@ -5,8 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#f3f3f3">
   <title>Skippy — Rhythm sketchbook</title>
-  <link rel="stylesheet" href="styles.css?v=20260928-3">
-  <script src="app.js?v=20260928-3" defer></script>
+  <link rel="stylesheet" href="styles.css?v=20260930-3">
+  <script src="app.js?v=20260930-1" defer></script>
 </head>
 <body>
   <header class="masthead"><a class="brand" href="./"><span aria-hidden="true">● ∘</span> skippy</a><span class="tagline">A rhythm sketchbook</span></header>
@@ -15,15 +15,15 @@
       <div class="sheet-heading"><h1 id="sheet-title">Your rhythm</h1><span id="block-count">1 block · 2 beats</span></div>
       <div id="blocks" class="blocks"></div>
       <div class="sheet-footer">
-        <button id="add-block" class="add-button" type="button"><span aria-hidden="true">＋</span> Add two beats</button>
-        <button id="random-block" class="add-button random-button" type="button"><span aria-hidden="true">⚄</span> Random two beats</button>
-        <button id="random-six-counts" class="add-button random-button" type="button"><span aria-hidden="true">⚄</span> Random six counts</button>
+        <button id="add-block" class="add-button" type="button" hidden><span aria-hidden="true">＋</span> Add two beats</button>
+        <button id="random-block" class="add-button random-button" type="button" hidden><span aria-hidden="true">⚄</span> Random two beats</button>
+        <button id="random-six-counts" class="add-button random-button" type="button">Add 6</button>
       </div>
     </section>
     <details class="legend">
       <summary>Notation &amp; help</summary>
       <p class="legend-note">Click a slot to cycle through step, hop, action, and empty.</p>
-      <p class="legend-note">Randomize replaces a block’s slots with a random mix of steps, hops, and actions. Numbered beats always have a symbol; &amp; and a may be empty. Random two beats adds a new random block. Random six counts adds three random two-beat blocks. On an untouched sheet, it replaces the starting empty block; otherwise it appends to your rhythm. Click any slot to adjust it.</p>
+      <p class="legend-note">⟳ (Randomize) replaces a block’s slots with a random mix of steps, hops, and actions. Numbered beats always have a symbol; &amp; and a may be empty. <span id="beat-tools-help" hidden>Add two beats adds a new empty block. Random two beats adds a new random block. </span>Add 6 adds three random two-beat blocks. On an untouched sheet, it replaces the starting empty block; otherwise it appends to your rhythm. Click any slot to adjust it.</p>
       <dl>
         <div><dt><span class="legend-symbol" aria-hidden="true"><span class="legend-mark is-large" data-state="1"></span><span class="legend-mark" data-state="1"></span></span> Step</dt><dd>A step with a weight change</dd></div>
         <div><dt><span class="legend-symbol" aria-hidden="true"><span class="legend-mark is-large" data-state="2"></span><span class="legend-mark" data-state="2"></span></span> Hop</dt><dd>A hop on the supporting foot</dd></div>
@@ -42,8 +42,12 @@
         <h2></h2>
         <div class="block-controls">
           <button class="print-button" type="button" title="Print this block or save it as PDF" hidden>Print / PDF</button>
-          <button class="randomize-button" type="button" title="Randomize this block’s actions">Randomize</button>
-          <button class="remove-button" type="button" title="Remove block">×</button>
+          <button class="randomize-button" type="button" title="Randomize this block’s actions" aria-label="Randomize block">
+            <svg class="control-icon" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" focusable="false"><path d="M20 7v5h-5"/><path d="M20 12a8 8 0 1 0-2.34 5.66"/></svg>
+          </button>
+          <button class="remove-button" type="button" title="Remove block" aria-label="Remove block">
+            <svg class="control-icon" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" focusable="false"><path d="m6 6 12 12M18 6 6 18"/></svg>
+          </button>
         </div>
       </div>
       <div class="positions"></div>

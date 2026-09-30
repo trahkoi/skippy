@@ -120,14 +120,29 @@ h1 {
   color: var(--text-muted);
   font-weight: 600;
 }
+.randomize-button,
 .remove-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   border: 0;
   border-radius: 5px;
   background: transparent;
   color: var(--text-muted);
   width: 28px;
   height: 28px;
-  font-size: 20px;
+  padding: 0;
+  line-height: 1;
+}
+.control-icon {
+  display: block;
+  flex: none;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  pointer-events: none;
 }
 .block-controls {
   display: flex;
@@ -136,7 +151,6 @@ h1 {
   align-items: center;
   gap: 6px;
 }
-.randomize-button,
 .print-button {
   border: 1px solid var(--border);
   border-radius: 5px;
@@ -146,12 +160,12 @@ h1 {
   font-size: 11px;
 }
 .randomize-button:hover,
+.remove-button:hover {
+  background: var(--shadow);
+  color: var(--rich-mahogany);
+}
 .print-button:hover {
   background: var(--amber-flame);
-}
-.remove-button:hover {
-  background: var(--amber-flame);
-  color: var(--rich-mahogany);
 }
 .remove-button:disabled {
   visibility: hidden;
