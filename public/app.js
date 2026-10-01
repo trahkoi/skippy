@@ -53,6 +53,7 @@ function updateBlocks() {
     // Support both heading levels while older HTML may still be cached.
     block.querySelector('.block-heading h2, .block-heading h3').textContent = `Beats ${firstBeat}–${firstBeat + 1}`;
     block.setAttribute('aria-label', `Block ${index + 1}, beats ${firstBeat}–${firstBeat + 1}`);
+    block.querySelector('.expand-button')?.setAttribute('aria-label', `Open practice view for block ${index + 1}`);
     const remove = block.querySelector('.remove-button');
     remove.disabled = blocks.children.length === 1;
     remove.setAttribute('aria-label', `Remove block ${index + 1}`);
@@ -116,6 +117,92 @@ function addBlock(focus = false, randomize = false, states = '000000', update = 
   }
 }
 
+// Match the desktop layout; practice is a read-only view of existing blocks.
+const desktopView = window.matchMedia('(min-width: 651px)');
+const practice = document.querySelector('#practice-view');
+const practiceNotation = document.querySelector('#practice-notation');
+const fullscreenButton = document.querySelector('#practice-fullscreen');
+let practiceIndex = 0;
+let practiceTrigger = null;
+let practiceScroll = 0;
+let practiceFullscreen = false;
+
+function renderPractice() {
+  const block = blocks.children[practiceIndex];
+  if (!block) return closePractice();
+  const heading = block.querySelector('.block-heading h2, .block-heading h3').textContent;
+  document.querySelector('#practice-title').textContent = `${heading} · Block ${practiceIndex + 1} of ${blocks.children.length}`;
+  practiceNotation.replaceChildren();
+  block.querySelectorAll('.position').forEach(position => {
+    const copy = document.createElement('div');
+    copy.className = position.className;
+    const source = position.querySelector('.slot');
+    const mark = document.createElement('span');
+    mark.className = 'slot';
+    mark.dataset.state = source.dataset.state;
+    mark.setAttribute('role', 'img');
+    mark.setAttribute('aria-label', source.getAttribute('aria-label').split('. Click')[0]);
+    copy.append(mark, position.querySelector('.count').cloneNode(true));
+    practiceNotation.append(copy);
+  });
+}
+
+function openPractice(block, trigger) {
+  if (!desktopView.matches || practice.open) return;
+  practiceIndex = [...blocks.children].indexOf(block);
+  practiceTrigger = trigger;
+  practiceScroll = window.scrollY;
+  renderPractice();
+  fullscreenButton.hidden = !document.fullscreenEnabled;
+  document.querySelector('#practice-status').textContent = '';
+  document.body.classList.add('practising');
+  practice.showModal();
+}
+
+function closePractice() {
+  if (practice.open) practice.close();
+}
+
+practice.addEventListener('close', () => {
+  if (practiceFullscreen && document.fullscreenElement) document.exitFullscreen().catch(() => {});
+  document.body.classList.remove('practising');
+  if (desktopView.matches && practiceTrigger?.isConnected) practiceTrigger.focus({ preventScroll: true });
+  window.scrollTo(0, practiceScroll);
+});
+document.querySelector('#practice-close').addEventListener('click', closePractice);
+practice.addEventListener('keydown', event => {
+  if (event.altKey || event.ctrlKey || event.metaKey || event.shiftKey) return;
+  if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') {
+    event.preventDefault();
+    practiceIndex = Math.max(0, Math.min(blocks.children.length - 1,
+      practiceIndex + (event.key === 'ArrowRight' ? 1 : -1)));
+    renderPractice();
+  }
+});
+fullscreenButton.addEventListener('click', async () => {
+  try {
+    if (document.fullscreenElement) await document.exitFullscreen();
+    else {
+      practiceFullscreen = true;
+      await document.documentElement.requestFullscreen();
+    }
+  } catch (error) {
+    practiceFullscreen = false;
+    document.querySelector('#practice-status').textContent = 'Fullscreen is unavailable. Practice view still fills the browser window.';
+  }
+});
+document.addEventListener('fullscreenchange', () => {
+  fullscreenButton.textContent = document.fullscreenElement ? 'Exit fullscreen' : 'Fullscreen';
+  document.querySelector('#practice-help').textContent = document.fullscreenElement
+    ? '← → Switch blocks · Esc Exit fullscreen'
+    : '← → Switch blocks · Esc Close';
+  if (practiceFullscreen && document.fullscreenElement && !practice.open) document.exitFullscreen().catch(() => {});
+  if (!document.fullscreenElement) practiceFullscreen = false;
+});
+desktopView.addEventListener('change', () => {
+  if (!desktopView.matches) closePractice();
+});
+
 function clearPrintSelection() {
   blocks.classList.remove('printing-block');
   blocks.querySelector('.print-selected')?.classList.remove('print-selected');
@@ -125,6 +212,11 @@ function clearPrintSelection() {
 window.addEventListener('afterprint', clearPrintSelection);
 
 blocks.addEventListener('click', (event) => {
+  const expand = event.target.closest('.expand-button');
+  if (expand) {
+    openPractice(expand.closest('.block'), expand);
+    return;
+  }
   const print = event.target.closest('.print-button');
   if (print) {
     if (!printingEnabled) return;
@@ -206,6 +298,7 @@ function loadSharedRhythm() {
   try {
     const sharedBlocks = rhythmFromHash(window.location.hash);
     if (!sharedBlocks) return;
+    closePractice();
     clearPrintSelection();
     blocks.replaceChildren();
     sharedBlocks.forEach(states => addBlock(false, false, states, false));
