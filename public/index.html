@@ -5,8 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#f3f3f3">
   <title>Skippy — Rhythm sketchbook</title>
-  <link rel="stylesheet" href="styles.css?v=20260930-6">
-  <script src="app.js?v=20260930-8" defer></script>
+  <link rel="stylesheet" href="styles.css?v=20261001-1">
+  <script src="app.js?v=20261001-1" defer></script>
 </head>
 <body>
   <header class="masthead"><a class="brand" href="./"><span aria-hidden="true">● ∘</span> skippy</a><span class="tagline">A rhythm sketchbook</span></header>
@@ -15,6 +15,10 @@
       <div class="sheet-heading"><h1 id="sheet-title">Your rhythm</h1><span id="block-count">1 block · 2 beats</span></div>
       <div id="blocks" class="blocks"></div>
       <div class="sheet-footer">
+        <label class="safe-mode-control" for="safe-mode">
+          <input id="safe-mode" type="checkbox" role="switch" aria-describedby="safe-mode-help">
+          Safe mode <span>Basics</span>
+        </label>
         <button id="add-block" class="add-button" type="button" hidden><span aria-hidden="true">＋</span> Add two beats</button>
         <button id="random-block" class="add-button random-button" type="button" hidden><span aria-hidden="true">⚄</span> Random two beats</button>
         <button id="random-six-counts" class="add-button random-button" type="button">6-count</button>
@@ -33,8 +37,9 @@
       <summary>Notation &amp; help</summary>
       <p class="legend-note">Click a slot to cycle through step, hop, action, and empty.</p>
       <p class="legend-note">Clear resets your rhythm to one empty block.</p>
+      <p id="safe-mode-help" class="legend-note">Safe mode limits all random generation to the Basics set: step step, triple, triple variant, delayed double, delayed single, and quad. Switching modes keeps your current rhythm. Slots stay editable, and adding or clearing to an empty block still works. Shared rhythms open normally; Safe mode is selected when every shared block matches a Basics preset.</p>
       <p class="legend-note">Share rhythm copies a link that opens an editable copy of your rhythm. Share again after making changes to create an updated link. Nothing is saved on a server.</p>
-      <p class="legend-note">⟳ (Randomize) replaces a block’s slots with a random mix of steps, hops, and actions. Numbered beats always have a symbol; &amp; and a may be empty. <span id="beat-tools-help" hidden>Add two beats adds a new empty block. Random two beats adds a new random block. </span>6-count adds three random two-beat blocks. On an untouched sheet, it replaces the starting empty block; otherwise it appends to your rhythm. Click any slot to adjust it.</p>
+      <p class="legend-note">⟳ (Randomize) replaces a block’s slots with a random mix of steps, hops, and actions, or a Basics preset in Safe mode. Numbered beats always have a symbol; &amp; and a may be empty. <span id="beat-tools-help" hidden>Add two beats adds a new empty block. Random two beats adds a new random block. </span>6-count adds three random two-beat blocks. On an untouched sheet, it replaces the starting empty block; otherwise it appends to your rhythm. Click any slot to adjust it.</p>
       <dl>
         <div><dt><span class="legend-symbol" aria-hidden="true"><span class="legend-mark is-large" data-state="1"></span><span class="legend-mark" data-state="1"></span></span> Step</dt><dd>A step with a weight change</dd></div>
         <div><dt><span class="legend-symbol" aria-hidden="true"><span class="legend-mark is-large" data-state="2"></span><span class="legend-mark" data-state="2"></span></span> Hop</dt><dd>A hop on the supporting foot</dd></div>

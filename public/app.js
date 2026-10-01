@@ -4,6 +4,7 @@ const addButton = document.querySelector('#add-block');
 const randomButton = document.querySelector('#random-block');
 const sequenceButton = document.querySelector('#random-six-counts');
 const clearButton = document.querySelector('#clear-rhythm');
+const safeModeSwitch = document.querySelector('#safe-mode');
 let rhythmStarted = false;
 const queryParams = new URLSearchParams(window.location.search);
 const beatToolsEnabled = queryParams.get('showBeatTools') === 'true';
@@ -17,6 +18,23 @@ const actions = ['empty', 'step', 'hop', 'action without weight change'];
 const actionProbabilities = [0.05, 0.4, 1, 0.2, 0.6, 1];
 const actionWeights = { step: 6, 'action without weight change': 3, hop: 1 };
 const symbols = { small: ['', '•', '∘', '\\'], large: ['', '●', '◯', '\\'] };
+// Six slots in display order: & a 1 & a 2. States: 0 empty, 1 step, 3 action.
+const presetSets = {
+  Basics: [
+    { name: 'Step step', states: '001001' },
+    { name: 'Triple', states: '001011' },
+    { name: 'Triple variant', states: '011001' },
+    { name: 'Delayed double', states: '003011' },
+    { name: 'Delayed single', states: '003001' },
+    { name: 'Quad', states: '011011' },
+  ],
+};
+
+safeModeSwitch.addEventListener('change', () => {
+  document.querySelector('#status').textContent = safeModeSwitch.checked
+    ? 'Safe mode on. Future random generation uses Basics presets.'
+    : 'Safe mode off. Future random generation uses all actions.';
+});
 
 function describeSlot(slot, blockIndex, positionIndex) {
   const beat = (blockIndex * 2 + Math.floor(positionIndex / 3)) % 8 + 1;
@@ -57,6 +75,12 @@ function randomActionState() {
 
 function randomizeBlock(block) {
   const slots = [...block.querySelectorAll('.slot')];
+  if (safeModeSwitch.checked) {
+    const presets = presetSets.Basics;
+    const preset = presets[Math.floor(Math.random() * presets.length)];
+    slots.forEach((slot, index) => { slot.dataset.state = preset.states[index]; });
+    return;
+  }
   slots.forEach((slot, index) => {
     const hasAction = Math.random() < actionProbabilities[index];
     slot.dataset.state = hasAction
@@ -186,10 +210,13 @@ function loadSharedRhythm() {
     blocks.replaceChildren();
     sharedBlocks.forEach(states => addBlock(false, false, states, false));
     updateBlocks();
+    safeModeSwitch.checked = sharedBlocks.every(states =>
+      presetSets.Basics.some(preset => preset.states === states));
     // Even an empty shared rhythm is an intentional rhythm, not a fresh sheet.
     rhythmStarted = true;
     document.querySelector('#share-result').hidden = true;
-    document.querySelector('#status').textContent = 'Shared rhythm loaded. You can edit it and share your own copy.';
+    document.querySelector('#status').textContent = 'Shared rhythm loaded. You can edit it and share your own copy.'
+      + (safeModeSwitch.checked ? ' Safe mode selected: every block matches a Basics preset.' : ' Safe mode off.');
   } catch (error) {
     document.querySelector('#status').textContent = 'This rhythm link is invalid, unsupported, or too large. Your current rhythm has not been changed.';
   }

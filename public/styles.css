@@ -279,6 +279,50 @@ h1 {
   line-height: 20px;
   min-height: 44px;
 }
+.safe-mode-control {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  font-size: 13px;
+  cursor: pointer;
+}
+.safe-mode-control span {
+  color: var(--text-muted);
+  font-size: 11px;
+}
+.safe-mode-control input {
+  appearance: none;
+  position: relative;
+  width: 36px;
+  height: 22px;
+  margin: 0;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--white-smoke);
+  cursor: pointer;
+}
+.safe-mode-control input::after {
+  content: '';
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--text-muted);
+}
+.safe-mode-control input:checked {
+  background: var(--amber-flame);
+}
+.safe-mode-control input:checked::after {
+  left: 17px;
+  background: var(--rich-mahogany);
+}
+.safe-mode-control input:focus-visible {
+  outline: 3px solid var(--rich-mahogany);
+  outline-offset: 4px;
+}
 .add-button span {
   margin-right: 7px;
 }
