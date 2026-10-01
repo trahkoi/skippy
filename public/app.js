@@ -126,6 +126,12 @@ let practiceIndex = 0;
 let practiceTrigger = null;
 let practiceScroll = 0;
 let practiceFullscreen = false;
+let practiceTouch = null;
+
+function movePractice(direction) {
+  practiceIndex = Math.max(0, Math.min(blocks.children.length - 1, practiceIndex + direction));
+  renderPractice();
+}
 
 function renderPractice() {
   const block = blocks.children[practiceIndex];
@@ -164,6 +170,7 @@ function closePractice() {
 }
 
 practice.addEventListener('close', () => {
+  practiceTouch = null;
   if (practiceFullscreen && document.fullscreenElement) document.exitFullscreen().catch(() => {});
   document.body.classList.remove('practising');
   if (desktopView.matches && practiceTrigger?.isConnected) practiceTrigger.focus({ preventScroll: true });
@@ -174,11 +181,39 @@ practice.addEventListener('keydown', event => {
   if (event.altKey || event.ctrlKey || event.metaKey || event.shiftKey) return;
   if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') {
     event.preventDefault();
-    practiceIndex = Math.max(0, Math.min(blocks.children.length - 1,
-      practiceIndex + (event.key === 'ArrowRight' ? 1 : -1)));
-    renderPractice();
+    movePractice(event.key === 'ArrowRight' ? 1 : -1);
   }
 });
+practice.addEventListener('touchstart', event => {
+  practiceTouch = null;
+  if (!practice.open || event.touches.length !== 1 || event.target.closest('button')) return;
+  const touch = event.touches[0];
+  practiceTouch = { id: touch.identifier, x: touch.clientX, y: touch.clientY };
+}, { passive: true });
+practice.addEventListener('touchmove', event => {
+  if (!practiceTouch) return;
+  const touch = [...event.touches].find(touch => touch.identifier === practiceTouch.id);
+  // Once a gesture becomes vertical or multi-touch, leave it to the browser.
+  if (event.touches.length !== 1 || !touch ||
+      Math.abs(touch.clientY - practiceTouch.y) > Math.max(20, Math.abs(touch.clientX - practiceTouch.x))) {
+    practiceTouch = null;
+  }
+}, { passive: true });
+practice.addEventListener('touchend', event => {
+  const start = practiceTouch;
+  practiceTouch = null;
+  if (!practice.open || !start || event.touches.length) return;
+  const touch = [...event.changedTouches].find(touch => touch.identifier === start.id);
+  if (!touch) return;
+  const dx = touch.clientX - start.x;
+  const dy = touch.clientY - start.y;
+  if (Math.abs(dx) >= 50 && Math.abs(dx) > Math.abs(dy) * 1.5) {
+    movePractice(dx < 0 ? 1 : -1);
+  }
+}, { passive: true });
+practice.addEventListener('touchcancel', () => {
+  practiceTouch = null;
+}, { passive: true });
 fullscreenButton.addEventListener('click', async () => {
   try {
     if (document.fullscreenElement) await document.exitFullscreen();
