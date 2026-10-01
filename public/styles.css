@@ -19,6 +19,8 @@
 }
 body {
   margin: 0;
+  /* Allow scrolling and pinch zoom without double-tap zoom. */
+  touch-action: manipulation;
 }
 button,
 a {
