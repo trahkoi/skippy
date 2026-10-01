@@ -450,6 +450,7 @@ body.practising {
 }
 #practice-view {
   --practice-unit: min(1vw, 1.8dvh);
+  touch-action: pan-y pinch-zoom;
   position: fixed;
   inset: 0;
   width: 100%;
