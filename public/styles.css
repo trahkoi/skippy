@@ -210,9 +210,7 @@ h1 {
   box-sizing: border-box;
 }
 .slot[data-state="0"]::after {
-  width: 10px;
-  height: 1px;
-  background: var(--text-muted);
+  content: none;
 }
 .slot[data-state="1"]::after,
 .slot[data-state="2"]::after,
@@ -668,12 +666,6 @@ body.practising {
     font-size: 28pt;
   }
   /* Borders print even when the browser omits background graphics. */
-  .slot[data-state="0"]::after {
-    width: 8mm;
-    height: 0;
-    background: none;
-    border-top: 0.5mm solid currentColor;
-  }
   .slot[data-state="1"]::after,
   .slot[data-state="2"]::after {
     width: 10mm;
