@@ -1,4 +1,7 @@
 const blocks = document.querySelector('#blocks');
+const blockStrip = document.querySelector('#block-strip');
+let selectedBlock = null;
+let nextBlockId = 0;
 const template = document.querySelector('#block-template');
 const addButton = document.querySelector('#add-block');
 const randomButton = document.querySelector('#random-block');
@@ -47,6 +50,72 @@ function describeSlot(slot, blockIndex, positionIndex) {
   slot.nextElementSibling.textContent = part;
 }
 
+function selectBlock(block, focusTab = false) {
+  selectedBlock = block;
+  [...blocks.children].forEach(item => { item.hidden = item !== block; });
+  [...blockStrip.children].forEach(tab => {
+    const selected = tab.getAttribute('aria-controls') === block.id;
+    tab.setAttribute('aria-selected', String(selected));
+    tab.setAttribute('aria-current', String(selected));
+    tab.tabIndex = selected ? 0 : -1;
+    if (selected) {
+      if (focusTab) tab.focus();
+      // Keep the selected preview visible without scrolling the whole page.
+      if (tab.offsetLeft < blockStrip.scrollLeft) blockStrip.scrollLeft = tab.offsetLeft;
+      else if (tab.offsetLeft + tab.offsetWidth > blockStrip.scrollLeft + blockStrip.clientWidth) {
+        blockStrip.scrollLeft = tab.offsetLeft + tab.offsetWidth - blockStrip.clientWidth;
+      }
+    }
+  });
+}
+
+function updateStrip() {
+  const focusedTab = blockStrip.contains(document.activeElement)
+    ? document.activeElement.getAttribute('aria-controls') : null;
+  blockStrip.replaceChildren();
+  [...blocks.children].forEach((block, index) => {
+    const tab = document.createElement('button');
+    tab.type = 'button';
+    tab.className = 'block-tab';
+    tab.id = `${block.id}-tab`;
+    tab.setAttribute('role', 'tab');
+    tab.setAttribute('aria-controls', block.id);
+    const firstBeat = (index * 2) % 8 + 1;
+    tab.setAttribute('aria-label', `Block ${index + 1}, beats ${firstBeat} to ${firstBeat + 1}`);
+    const preview = document.createElement('span');
+    preview.className = 'positions';
+    preview.setAttribute('aria-hidden', 'true');
+    block.querySelectorAll('.position').forEach(position => {
+      const copy = document.createElement('span');
+      copy.className = position.className;
+      const mark = document.createElement('span');
+      mark.className = 'slot';
+      mark.dataset.state = position.querySelector('.slot').dataset.state;
+      copy.append(mark, position.querySelector('.count').cloneNode(true));
+      preview.append(copy);
+    });
+    tab.append(preview);
+    blockStrip.append(tab);
+  });
+  if (!selectedBlock?.isConnected) selectedBlock = blocks.firstElementChild;
+  if (selectedBlock) selectBlock(selectedBlock);
+  if (focusedTab) [...blockStrip.children].find(tab => tab.getAttribute('aria-controls') === focusedTab)?.focus();
+}
+
+blockStrip.addEventListener('click', event => {
+  const tab = event.target.closest('.block-tab');
+  if (tab) selectBlock(document.getElementById(tab.getAttribute('aria-controls')));
+});
+blockStrip.addEventListener('keydown', event => {
+  const tabs = [...blockStrip.children];
+  const index = tabs.indexOf(event.target.closest('.block-tab'));
+  if (index < 0 || !['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) return;
+  event.preventDefault();
+  const next = event.key === 'Home' ? 0 : event.key === 'End' ? tabs.length - 1
+    : (index + (event.key === 'ArrowRight' ? 1 : -1) + tabs.length) % tabs.length;
+  selectBlock(blocks.children[next], true);
+});
+
 function updateBlocks() {
   [...blocks.children].forEach((block, index) => {
     const firstBeat = (index * 2) % 8 + 1;
@@ -61,6 +130,7 @@ function updateBlocks() {
     block.querySelector('.print-button')?.setAttribute('aria-label', `Print block ${index + 1} or save as PDF`);
     block.querySelectorAll('.slot').forEach((slot, position) => describeSlot(slot, index, position));
   });
+  updateStrip();
   const count = blocks.children.length;
   document.querySelector('#block-count').textContent = `${count} ${count === 1 ? 'block' : 'blocks'} · ${count * 2} beats`;
 }
@@ -93,6 +163,9 @@ function randomizeBlock(block) {
 function addBlock(focus = false, randomize = false, states = '000000', update = true) {
   const block = template.content.firstElementChild.cloneNode(true);
   block.querySelector('.print-button').hidden = !printingEnabled;
+  block.id = `rhythm-block-${nextBlockId++}`;
+  block.setAttribute('role', 'tabpanel');
+  block.setAttribute('aria-labelledby', `${block.id}-tab`);
   const positions = block.querySelector('.positions');
   for (let index = 0; index < 6; index++) {
     const position = document.createElement('div');
@@ -111,6 +184,7 @@ function addBlock(focus = false, randomize = false, states = '000000', update = 
   if (randomize) randomizeBlock(block);
   if (update) updateBlocks();
   if (focus) {
+    selectBlock(block);
     rhythmStarted = true;
     block.querySelector('.slot').focus();
     document.querySelector('#status').textContent = `Block ${blocks.children.length} added${randomize ? ' with randomized actions' : ''}.`;
@@ -280,12 +354,14 @@ blocks.addEventListener('click', (event) => {
     slot.dataset.state = String((Number(slot.dataset.state) + 1) % 4);
     const block = slot.closest('.block');
     describeSlot(slot, [...blocks.children].indexOf(block), [...block.querySelectorAll('.slot')].indexOf(slot));
+    updateStrip();
   }
   const remove = event.target.closest('.remove-button');
   if (remove && blocks.children.length > 1) {
     const block = remove.closest('.block');
     const next = block.nextElementSibling || block.previousElementSibling;
     block.remove();
+    selectedBlock = next;
     updateBlocks();
     next.querySelector('.slot').focus();
     document.querySelector('#status').textContent = 'Block removed. Counts updated.';
@@ -309,6 +385,7 @@ sequenceButton?.addEventListener('click', () => {
   const firstNewBlock = blocks.children.length;
   for (let index = 0; index < 3; index++) addBlock(false, true);
   rhythmStarted = true;
+  selectBlock(blocks.children[firstNewBlock]);
   blocks.children[firstNewBlock].querySelector('.slot').focus();
   document.querySelector('#status').textContent = 'Six random counts generated as three two-beat blocks.';
 });

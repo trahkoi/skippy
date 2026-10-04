@@ -1,6 +1,6 @@
 # Skippy
 
-A lightweight rhythm sketchbook made with plain HTML, CSS, and a little JavaScript. No dependencies, build step, or network connection needed.
+A lightweight rhythm sketchbook made with plain HTML, CSS, and a little JavaScript. No build step or runtime dependencies. Instrument Sans loads from Google Fonts when online, with a system-font fallback offline.
 
 Open `public/index.html` in your browser.
 
@@ -16,7 +16,7 @@ Run commands from the repository root. Release packaging reads from `public/` by
 
 - Click a slot (or focus it and press Space/Enter) to cycle through empty → step → hop → action → empty.
 - Numbered counts use ● and ◯. The “&” and “a” subdivisions use • and ∘. A backslash represents an action without a weight change on any subdivision.
-- **Add two beats** and **Random two beats** are hidden by default. Add `?showBeatTools=true` to the URL (or `&showBeatTools=true` alongside other query parameters) to show both buttons and their help text. Removing the parameter or using any other value hides them on the next page load. Blocks wrap onto new lines as needed. Counts run from 1 through 8, then repeat.
+- **Add two beats** and **Random two beats** are hidden by default. Add `?showBeatTools=true` to the URL (or `&showBeatTools=true` alongside other query parameters) to show both buttons and their help text. Removing the parameter or using any other value hides them on the next page load. The focused block appears above a scrollable thumbnail strip. Select a thumbnail to edit that block; use Left/Right or Home/End while the strip is focused to navigate. Counts run from 1 through 8, then repeat.
 - Click **⟳ (Randomize)** on any block, including the first, to replace its slots with randomized steps, hops, and actions. **Random two beats** adds a new random block. The chances of a symbol in each block’s six slots (& a 1 & a 2) are 5%, 40%, 100%, 20%, 60%, and 100%, respectively. When a slot has a symbol, it has a 60% chance of a step, 30% chance of an action without weight change, and 10% chance of a hop (weights 6:3:1). Every slot stays editable.
 - Click **6-count** to generate three ordinary randomized two-beat blocks. If this is your first rhythm action, they replace the initial empty block; after editing, randomizing, or adding blocks, they append to the existing rhythm. Each block can be edited, randomized, removed, or printed independently, and numbering continues through 8 before repeating.
 - On desktop (above 650px wide), click a block’s expand icon to open **Practice view**. Its two beats fill the browser view with large, high-contrast, read-only notation. Left/right arrow keys move between blocks, stopping at the ends. Close or Escape returns to the overview at the same scroll position. Fullscreen is available when supported; Escape exits fullscreen first. The expand control is hidden on mobile, and narrowing the window to the mobile layout closes practice view.

@@ -3,54 +3,64 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#f3f3f3">
+  <meta name="theme-color" content="#f1eeee">
   <title>Skippy — Rhythm sketchbook</title>
-  <link rel="stylesheet" href="styles.css?v=20261001-3">
-  <script src="app.js?v=20261001-3" defer></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&amp;display=swap">
+  <link rel="stylesheet" href="styles.css?v=20261004-1">
+  <script src="app.js?v=20261004-1" defer></script>
 </head>
 <body>
-  <header class="masthead"><a class="brand" href="./"><span aria-hidden="true">● ∘</span> skippy</a><span class="tagline">A rhythm sketchbook</span></header>
-  <main>
-    <section class="sheet" aria-labelledby="sheet-title">
-      <div class="sheet-heading"><h1 id="sheet-title">Your rhythm</h1><span id="block-count">1 block · 2 beats</span></div>
-      <div id="blocks" class="blocks"></div>
-      <div class="sheet-footer">
-        <label class="safe-mode-control" for="safe-mode">
-          <input id="safe-mode" type="checkbox" role="switch" aria-describedby="safe-mode-help">
-          Safe mode <span>Basics</span>
-        </label>
-        <button id="add-block" class="add-button" type="button" hidden><span aria-hidden="true">＋</span> Add two beats</button>
-        <button id="random-block" class="add-button random-button" type="button" hidden><span aria-hidden="true">⚄</span> Random two beats</button>
-        <button id="random-six-counts" class="add-button random-button" type="button">6-count</button>
-        <button id="clear-rhythm" class="add-button random-button" type="button">Clear</button>
-        <button id="share-rhythm" class="add-button share-button" type="button" aria-label="Share rhythm" title="Share rhythm">
-          <svg class="control-icon" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false"><path d="M12 15V2m-4 4 4-4 4 4M8 9H5v12h14V9h-3"/></svg>
-        </button>
-        <p id="status" role="status"></p>
-      </div>
-      <div id="share-result" class="share-result" hidden>
-        <label for="share-url">Rhythm link — a snapshot from when you clicked Share</label>
-        <input id="share-url" type="text" readonly spellcheck="false">
-      </div>
-    </section>
-    <details class="legend">
-      <summary>Notation &amp; help</summary>
-      <p class="legend-note">Click a slot to cycle through step, hop, action, and empty.</p>
-      <p class="legend-note">Clear resets your rhythm to one empty block.</p>
-      <p id="safe-mode-help" class="legend-note">Safe mode limits all random generation to the Basics set: step step, triple, triple variant, delayed double, delayed single, and quad. Switching modes keeps your current rhythm. Slots stay editable, and adding or clearing to an empty block still works. Shared rhythms open normally; Safe mode is selected when every shared block matches a Basics preset.</p>
-      <p class="legend-note">Share rhythm copies a link that opens an editable copy of your rhythm. Share again after making changes to create an updated link. Nothing is saved on a server.</p>
-      <p class="legend-note">⟳ (Randomize) replaces a block’s slots with a random mix of steps, hops, and actions, or a Basics preset in Safe mode. Numbered beats always have a symbol; &amp; and a may be empty. <span id="beat-tools-help" hidden>Add two beats adds a new empty block. Random two beats adds a new random block. </span>6-count adds three random two-beat blocks. On an untouched sheet, it replaces the starting empty block; otherwise it appends to your rhythm. Click any slot to adjust it.</p>
-      <dl>
-        <div><dt><span class="legend-symbol" aria-hidden="true"><span class="legend-mark is-large" data-state="1"></span><span class="legend-mark" data-state="1"></span></span> Step</dt><dd>A step with a weight change</dd></div>
-        <div><dt><span class="legend-symbol" aria-hidden="true"><span class="legend-mark is-large" data-state="2"></span><span class="legend-mark" data-state="2"></span></span> Hop</dt><dd>A hop on the supporting foot</dd></div>
-        <div><dt><span class="legend-symbol" aria-hidden="true"><span class="legend-mark is-large" data-state="3"></span></span> Action</dt><dd>No weight change, like a kick</dd></div>
-      </dl>
-      <p class="legend-note">Large symbols on numbered counts. Small symbols on <em>&amp;</em> and <em>a</em>. An action can go anywhere.</p>
-      <p id="print-help" class="legend-note" hidden>Print / PDF prints only the block’s symbols and count labels. Choose Save as PDF in your browser’s print dialog to keep a copy. If the title, address, date, or page numbers appear, turn off Headers and footers in the print settings.</p>
-    </details>
-    <noscript><p>Enable JavaScript to place symbols and add rhythm blocks.</p></noscript>
-  </main>
-  <footer class="page-footer">Keep a share link to save a rhythm · edits are not saved automatically</footer>
+  <div class="app-card">
+    <header class="masthead"><a class="brand" href="./"><span class="brand-mark" aria-hidden="true"><i></i><i></i></span> skippy</a><span class="tagline">A rhythm sketchbook</span></header>
+    <main>
+      <section class="sheet" aria-labelledby="sheet-title">
+        <div class="sheet-heading"><h1 id="sheet-title">Your rhythm</h1><span id="block-count">1 block · 2 beats</span></div>
+        <div id="blocks" class="blocks"></div>
+        <div id="block-strip" class="block-strip" role="tablist" aria-label="Rhythm blocks"></div>
+        <div class="sheet-footer">
+          <div class="settings-row">
+            <label class="safe-mode-control" for="safe-mode">
+              <input id="safe-mode" type="checkbox" role="switch" aria-describedby="safe-mode-help">
+              Safe mode <span>Basics</span>
+            </label>
+            <button id="random-six-counts" class="add-button random-button" type="button">6-count</button>
+          </div>
+          <div class="action-row">
+            <button id="clear-rhythm" class="add-button random-button" type="button">Clear</button>
+            <button id="add-block" class="add-button" type="button" hidden><svg class="control-icon" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg> Add two beats</button>
+            <button id="random-block" class="add-button random-button" type="button" hidden><svg class="control-icon" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M3 7h3c4 0 5 10 9 10h5M3 17h3c1.5 0 2.6-1 3.5-2.3M13 9.3C13.8 8 14.8 7 16 7h4M17 4l3 3-3 3M17 14l3 3-3 3"/></svg> Random two beats</button>
+            <button id="share-rhythm" class="add-button share-button" type="button" aria-label="Share rhythm" title="Share rhythm">
+              <svg class="control-icon" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false"><path d="M12 15V4m-4 4 4-4 4 4M5 12v6a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-6"/></svg>
+            </button>
+          </div>
+          <p id="status" role="status"></p>
+        </div>
+        <div id="share-result" class="share-result" hidden>
+          <label for="share-url">Rhythm link — a snapshot from when you clicked Share</label>
+          <input id="share-url" type="text" readonly spellcheck="false">
+        </div>
+      </section>
+      <details class="legend">
+        <summary>Notation &amp; help</summary>
+        <p class="legend-note">Click a slot to cycle through step, hop, action, and empty.</p>
+        <p class="legend-note">Clear resets your rhythm to one empty block.</p>
+        <p id="safe-mode-help" class="legend-note">Safe mode limits all random generation to the Basics set: step step, triple, triple variant, delayed double, delayed single, and quad. Switching modes keeps your current rhythm. Slots stay editable, and adding or clearing to an empty block still works. Shared rhythms open normally; Safe mode is selected when every shared block matches a Basics preset.</p>
+        <p class="legend-note">Share rhythm copies a link that opens an editable copy of your rhythm. Share again after making changes to create an updated link. Nothing is saved on a server.</p>
+        <p class="legend-note">⟳ (Randomize) replaces a block’s slots with a random mix of steps, hops, and actions, or a Basics preset in Safe mode. Numbered beats always have a symbol; &amp; and a may be empty. <span id="beat-tools-help" hidden>Add two beats adds a new empty block. Random two beats adds a new random block. </span>6-count adds three random two-beat blocks. On an untouched sheet, it replaces the starting empty block; otherwise it appends to your rhythm. Click any slot to adjust it.</p>
+        <dl>
+          <div><dt><span class="legend-symbol" aria-hidden="true"><span class="legend-mark is-large" data-state="1"></span><span class="legend-mark" data-state="1"></span></span> Step</dt><dd>A step with a weight change</dd></div>
+          <div><dt><span class="legend-symbol" aria-hidden="true"><span class="legend-mark is-large" data-state="2"></span><span class="legend-mark" data-state="2"></span></span> Hop</dt><dd>A hop on the supporting foot</dd></div>
+          <div><dt><span class="legend-symbol" aria-hidden="true"><span class="legend-mark is-large" data-state="3"></span></span> Action</dt><dd>No weight change, like a kick</dd></div>
+        </dl>
+        <p class="legend-note">Large symbols on numbered counts. Small symbols on <em>&amp;</em> and <em>a</em>. An action can go anywhere.</p>
+        <p id="print-help" class="legend-note" hidden>Print / PDF prints only the block’s symbols and count labels. Choose Save as PDF in your browser’s print dialog to keep a copy. If the title, address, date, or page numbers appear, turn off Headers and footers in the print settings.</p>
+      </details>
+      <noscript><p>Enable JavaScript to place symbols and add rhythm blocks.</p></noscript>
+    </main>
+    <footer class="page-footer">Keep a share link to save a rhythm · edits are not saved automatically</footer>
+  </div>
   <dialog id="practice-view" aria-labelledby="practice-title" aria-describedby="practice-help">
     <div class="practice-toolbar">
       <h2 id="practice-title" aria-live="polite"></h2>
